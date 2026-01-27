@@ -16,7 +16,7 @@ A Claude Code skill for creating professional Instagram Reels and Carousel ads w
 ### Via skills.sh (Recommended)
 
 ```bash
-claude skills add Maartenlouis/remotion-ads-skill
+claude skills add Maartenlouis/remotion-ads
 ```
 
 ### Manual Installation
@@ -24,7 +24,7 @@ claude skills add Maartenlouis/remotion-ads-skill
 Clone to your project's `.claude/skills/` directory:
 
 ```bash
-git clone https://github.com/Maartenlouis/remotion-ads-skill.git .claude/skills/remotion-ads
+git clone https://github.com/Maartenlouis/remotion-ads.git .claude/skills/remotion-ads
 ```
 
 ## Quick Start

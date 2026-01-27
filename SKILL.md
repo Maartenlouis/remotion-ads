@@ -563,7 +563,7 @@ remotion-ads/
 │   └── generate.js                 # ElevenLabs voiceover generator
 ├── dictionaries/
 │   ├── template.pls                # Dictionary template
-│   └── medkonzept.pls              # Example dictionary
+│   └── example.pls                 # Example dictionary
 └── rules/
     ├── setup.md
     ├── voiceover.md                # Voiceover & dictionary docs

@@ -1,3 +1,11 @@
+---
+title: Reusable Components
+description: Template components for building Instagram Reels and Carousels
+section: video-creation
+priority: medium
+tags: [components, templates, react, layout, scenes]
+---
+
 # Reusable Components for Instagram Ads
 
 Template components for building Instagram Reels and Carousels with Remotion.

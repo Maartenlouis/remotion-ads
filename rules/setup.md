@@ -1,3 +1,11 @@
+---
+title: Project Setup Guide
+description: Initial project configuration, dependencies, and folder structure
+section: setup
+priority: high
+tags: [setup, installation, dependencies, configuration]
+---
+
 # Project Setup Guide
 
 Complete setup guide for using the remotion-ads skill in your project.

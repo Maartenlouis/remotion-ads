@@ -1,3 +1,11 @@
+---
+title: Local Assets Management
+description: Organizing and using backgrounds, icons, and illustrations
+section: assets
+priority: low
+tags: [assets, backgrounds, icons, illustrations, images]
+---
+
 # Local Assets for Instagram Ads
 
 Guide for organizing and using backgrounds, icons, and illustrations in Remotion Instagram videos.

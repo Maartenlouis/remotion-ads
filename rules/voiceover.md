@@ -1,3 +1,11 @@
+---
+title: Voiceover Integration
+description: ElevenLabs integration, scene JSON format, and timing synchronization
+section: video-creation
+priority: medium
+tags: [voiceover, audio, elevenlabs, timing, sync]
+---
+
 # Voiceover Integration for Instagram Ads
 
 Complete guide for generating and integrating professional voiceovers into Remotion Instagram videos.

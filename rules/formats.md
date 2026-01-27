@@ -1,3 +1,11 @@
+---
+title: Instagram Display Formats
+description: Display formats, dimensions, and safe zones for Instagram Reels
+section: formats
+priority: high
+tags: [dimensions, safe-zones, formats, instagram, reels]
+---
+
 # Instagram Display Formats
 
 Instagram shows Reels in multiple formats. Design for all three to ensure visibility.

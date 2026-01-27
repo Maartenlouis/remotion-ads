@@ -1,3 +1,11 @@
+---
+title: Animation Guide
+description: Spring configurations, transitions, and animation components
+section: video-creation
+priority: medium
+tags: [animation, spring, transitions, motion, effects]
+---
+
 # Animation Guide for Instagram Ads
 
 Animation patterns, spring configurations, and effects for Remotion Instagram videos.

@@ -1,3 +1,11 @@
+---
+title: Instagram Carousel Specifications
+description: Technical guide for creating Instagram carousels with Remotion
+section: assets
+priority: low
+tags: [carousel, static, images, slides, instagram]
+---
+
 # Instagram Carousel Design Specifications
 
 Technical guide for creating Instagram carousels with Remotion. Carousels are static image posts (up to 10 slides) that users swipe through.

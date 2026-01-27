@@ -1,3 +1,11 @@
+---
+title: Visual Design System Template
+description: Template for configuring brand colors, fonts, and assets
+section: setup
+priority: high
+tags: [branding, colors, fonts, design-system, configuration]
+---
+
 # Visual Design System Template
 
 Copy this file to `design-system.md` and fill in your brand values.

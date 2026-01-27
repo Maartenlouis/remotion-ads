@@ -1,3 +1,11 @@
+---
+title: Animated Captions
+description: TikTok-style animated captions with word-level timing and highlighting
+section: video-creation
+priority: medium
+tags: [captions, subtitles, animation, timing, tiktok]
+---
+
 # Instagram Reels Captions
 
 Modern animated captions for Instagram Reels with word-level timing, highlighting, and icon integration.

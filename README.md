@@ -13,15 +13,10 @@ A Claude Code skill for creating professional Instagram Reels and Carousel ads w
 
 ## Installation
 
-### Via Claude Code Plugin System
+### Via skills.sh
 
 ```bash
-/plugin marketplace add Maartenlouis/remotion-ads
-```
-
-Then use `/plugin` to browse and install, or:
-```bash
-/plugin install remotion-ads@Maartenlouis-remotion-ads
+npx skills add Maartenlouis/remotion-ads
 ```
 
 ### Manual Installation

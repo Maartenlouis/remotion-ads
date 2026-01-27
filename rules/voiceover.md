@@ -13,7 +13,6 @@ Complete guide for generating and integrating professional voiceovers into Remot
 ## Prerequisites
 
 - ElevenLabs API key in `.env.local`
-- ElevenLabs skill installed at `.claude/skills/elevenlabs/`
 
 ```bash
 ELEVENLABS_API_KEY=your_api_key_here
@@ -21,12 +20,80 @@ ELEVENLABS_API_KEY=your_api_key_here
 
 ---
 
+## Pronunciation Dictionaries
+
+Custom pronunciation dictionaries ensure brand names and technical terms are spoken correctly.
+
+### Creating a Dictionary
+
+1. Copy `dictionaries/template.pls` to `dictionaries/your-brand.pls`
+2. Add lexeme entries for words needing custom pronunciation
+3. Use `--dictionary your-brand` when generating
+
+### Dictionary Format (PLS)
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<lexicon version="1.0"
+      xmlns="http://www.w3.org/2005/01/pronunciation-lexicon"
+      alphabet="ipa" xml:lang="de-DE">
+
+  <!-- Brand name with phonetic pronunciation -->
+  <lexeme>
+    <grapheme>RF MedKonzept</grapheme>
+    <alias>err eff Med Konzept</alias>
+  </lexeme>
+
+  <!-- Abbreviation spelled out -->
+  <lexeme>
+    <grapheme>bAV</grapheme>
+    <alias>be ah fau</alias>
+  </lexeme>
+
+</lexicon>
+```
+
+### Using Dictionaries
+
+```bash
+# Use a specific dictionary
+node tools/generate.js \
+  --scenes scenes.json \
+  --dictionary medkonzept \
+  --output-dir public/audio/
+
+# Disable dictionary (use default pronunciation)
+node tools/generate.js \
+  --scenes scenes.json \
+  --no-dictionary \
+  --output-dir public/audio/
+
+# List available dictionaries
+node tools/generate.js --list-dictionaries
+```
+
+### How It Works
+
+1. **API Mode**: Dictionary is uploaded to ElevenLabs and applied during generation
+2. **Fallback Mode**: If API permissions fail, text is preprocessed with replacements
+
+The tool automatically caches dictionary IDs to avoid re-uploading
+
+---
+
 ## Quick Start
 
 ```bash
 # Generate voiceover from scenes JSON
-node .claude/skills/elevenlabs/generate.js \
+node tools/generate.js \
   --scenes remotion/instagram-ads/scenes/ad-example-scenes.json \
+  --with-timestamps \
+  --output-dir public/audio/instagram-ads/ad-example/
+
+# With pronunciation dictionary
+node tools/generate.js \
+  --scenes remotion/instagram-ads/scenes/ad-example-scenes.json \
+  --dictionary medkonzept \
   --with-timestamps \
   --output-dir public/audio/instagram-ads/ad-example/
 ```
@@ -217,7 +284,7 @@ export const AdWithPerSceneAudio: React.FC = () => {
 Generate with `--with-timestamps` for animated captions:
 
 ```bash
-node .claude/skills/elevenlabs/generate.js \
+node tools/generate.js \
   --scenes scenes.json \
   --with-timestamps \
   --output-dir public/audio/instagram-ads/ad-example/
@@ -258,14 +325,14 @@ If a scene needs adjustments:
 
 ```bash
 # Regenerate scene2 with new text
-node .claude/skills/elevenlabs/generate.js \
+node tools/generate.js \
   --scenes remotion/instagram-ads/scenes/ad-example-scenes.json \
   --scene scene2 \
   --new-text "Updated text for scene 2" \
   --output-dir public/audio/instagram-ads/ad-example/
 
 # Regenerate with different character
-node .claude/skills/elevenlabs/generate.js \
+node tools/generate.js \
   --scenes remotion/instagram-ads/scenes/ad-example-scenes.json \
   --scene scene3 \
   --character dramatic \
@@ -308,7 +375,7 @@ Use phonetic spelling in scenes.json for correct pronunciation, then display the
 Validate generated audio matches expected durations:
 
 ```bash
-node .claude/skills/elevenlabs/generate.js --validate public/audio/instagram-ads/ad-example/
+node tools/generate.js --validate public/audio/instagram-ads/ad-example/
 ```
 
 Output:
@@ -364,11 +431,12 @@ Output:
 # 1. Create scenes JSON
 vim remotion/instagram-ads/scenes/ad-new-scenes.json
 
-# 2. Generate voiceover with timestamps
-node .claude/skills/elevenlabs/generate.js \
+# 2. Generate voiceover with timestamps (and optional dictionary)
+node tools/generate.js \
   --scenes remotion/instagram-ads/scenes/ad-new-scenes.json \
   --with-timestamps \
   --character narrator \
+  --dictionary your-brand \
   --output-dir public/audio/instagram-ads/ad-new/
 
 # 3. Check actual durations in info.json
@@ -379,7 +447,7 @@ cat public/audio/instagram-ads/ad-new/ad-new-info.json
 npx remotion studio
 
 # 6. If scene needs adjustment, regenerate just that scene
-node .claude/skills/elevenlabs/generate.js \
+node tools/generate.js \
   --scenes remotion/instagram-ads/scenes/ad-new-scenes.json \
   --scene scene2 \
   --new-text "Adjusted text" \

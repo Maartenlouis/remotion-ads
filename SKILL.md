@@ -218,11 +218,32 @@ See [rules/design-system-template.md](rules/design-system-template.md) for compl
 
 ```bash
 # Generate voiceover with timestamps
-node .claude/skills/elevenlabs/generate.js \
+node tools/generate.js \
   --scenes remotion/instagram-ads/scenes/ad-example-scenes.json \
   --with-timestamps \
   --output-dir public/audio/instagram-ads/ad-example/
+
+# With pronunciation dictionary for brand names
+node tools/generate.js \
+  --scenes remotion/instagram-ads/scenes/ad-example-scenes.json \
+  --dictionary your-brand \
+  --with-timestamps \
+  --output-dir public/audio/instagram-ads/ad-example/
 ```
+
+### Pronunciation Dictionaries
+
+Create custom dictionaries in `dictionaries/` for correct brand name pronunciation:
+
+```xml
+<!-- dictionaries/your-brand.pls -->
+<lexeme>
+  <grapheme>YourBrand</grapheme>
+  <alias>Jor Bränd</alias>
+</lexeme>
+```
+
+See `dictionaries/template.pls` for full format.
 
 ### Scene JSON Format
 
@@ -280,7 +301,7 @@ See [rules/voiceover.md](rules/voiceover.md) for complete integration guide.
 Generate word-level timestamps for animated captions:
 
 ```bash
-node .claude/skills/elevenlabs/generate.js \
+node tools/generate.js \
   --scenes scenes.json \
   --with-timestamps \
   --output-dir public/audio/ad-example/
@@ -503,15 +524,18 @@ See [rules/components.md](rules/components.md) for scene template components.
 # 1. Setup (one time)
 cp rules/design-system-template.md rules/design-system.md
 # Edit design-system.md with your brand values
+cp dictionaries/template.pls dictionaries/your-brand.pls
+# Edit your-brand.pls with brand pronunciations
 node scripts/generate-backgrounds.js
 node scripts/scan-instagram-assets.js
 
 # 2. Create scenes JSON
 vim remotion/instagram-ads/scenes/ad-new-scenes.json
 
-# 3. Generate voiceover
-node .claude/skills/elevenlabs/generate.js \
+# 3. Generate voiceover (with optional dictionary)
+node tools/generate.js \
   --scenes remotion/instagram-ads/scenes/ad-new-scenes.json \
+  --dictionary your-brand \
   --with-timestamps \
   --output-dir public/audio/instagram-ads/ad-new/
 
@@ -525,4 +549,29 @@ npx remotion studio
 npx remotion render AdNew out/ad-new.mp4 --codec=h264 --crf=18
 
 # 7. Test on mobile before uploading
+```
+
+---
+
+## File Structure
+
+```
+remotion-ads/
+├── SKILL.md                        # This file
+├── README.md                       # Quick start guide
+├── tools/
+│   └── generate.js                 # ElevenLabs voiceover generator
+├── dictionaries/
+│   ├── template.pls                # Dictionary template
+│   └── medkonzept.pls              # Example dictionary
+└── rules/
+    ├── setup.md
+    ├── voiceover.md                # Voiceover & dictionary docs
+    ├── captions.md
+    ├── animations.md
+    ├── components.md
+    ├── formats.md
+    ├── local-assets.md
+    ├── carousels.md
+    └── design-system-template.md
 ```

@@ -35,6 +35,7 @@ See [rules/setup.md](rules/setup.md) for complete project setup.
 | File | Description |
 |------|-------------|
 | [rules/voiceover.md](rules/voiceover.md) | ElevenLabs integration, scene JSON, timing sync |
+| [rules/music.md](rules/music.md) | Suno AI background music generation |
 | [rules/captions.md](rules/captions.md) | Animated captions with word-level timing and highlighting |
 | [rules/animations.md](rules/animations.md) | Spring configs, transitions, animation components |
 | [rules/components.md](rules/components.md) | Reusable template components for scenes |
@@ -294,6 +295,66 @@ See [rules/voiceover.md](rules/voiceover.md) for complete integration guide.
 
 ---
 
+## Background Music
+
+### Quick Start
+
+```bash
+# Generate instrumental background music
+python3 tools/suno.py \
+  --prompt "Ambient, cinematic background for professional video. 30 seconds." \
+  --tags "ambient, cinematic, professional" \
+  --instrumental \
+  --output public/audio/instagram-ads/ad-example/background.mp3
+```
+
+### Prerequisites
+
+Add Suno authorization token to `.env.local`:
+```
+SUNO_AUTH_TOKEN=Bearer eyJ...
+```
+
+Get token from Suno DevTools (see [rules/music.md](rules/music.md) for details).
+
+### Integration with Voiceover
+
+```tsx
+import { Audio, staticFile } from "remotion";
+
+export const AdWithMusic: React.FC = () => {
+  return (
+    <AbsoluteFill>
+      {/* Background music - low volume during voiceover */}
+      <Audio
+        src={staticFile("audio/instagram-ads/ad-example/background.mp3")}
+        volume={0.2}
+      />
+
+      {/* Voiceover on top */}
+      <Audio
+        src={staticFile("audio/instagram-ads/ad-example/ad-example-combined.mp3")}
+        volume={1.0}
+      />
+
+      <VideoContent />
+    </AbsoluteFill>
+  );
+};
+```
+
+### Recommended Tags
+
+| Content Type | Tags |
+|--------------|------|
+| Professional/Legal | `ambient, professional, corporate, trustworthy, subtle` |
+| Dramatic Hook | `dramatic, tension, cinematic, building, suspense` |
+| Upbeat/Positive | `upbeat, modern, positive, clean, energetic` |
+
+See [rules/music.md](rules/music.md) for complete music integration guide.
+
+---
+
 ## Captions
 
 ### TikTok-Style Captions
@@ -532,23 +593,31 @@ node scripts/scan-instagram-assets.js
 # 2. Create scenes JSON
 vim remotion/instagram-ads/scenes/ad-new-scenes.json
 
-# 3. Generate voiceover (with optional dictionary)
+# 3. Generate background music
+python3 tools/suno.py \
+  --prompt "Professional ambient background, 20 seconds" \
+  --tags "ambient, professional, corporate" \
+  --instrumental \
+  --output public/audio/instagram-ads/ad-new/background.mp3
+
+# 4. Generate voiceover (with optional dictionary)
 node tools/generate.js \
   --scenes remotion/instagram-ads/scenes/ad-new-scenes.json \
   --dictionary your-brand \
   --with-timestamps \
   --output-dir public/audio/instagram-ads/ad-new/
 
-# 4. Create composition
+# 5. Create composition
 # Use actualDuration values from ad-new-info.json
+# Add both background music (volume 0.2) and voiceover
 
-# 5. Preview
+# 6. Preview
 npx remotion studio
 
-# 6. Render
+# 7. Render
 npx remotion render AdNew out/ad-new.mp4 --codec=h264 --crf=18
 
-# 7. Test on mobile before uploading
+# 8. Test on mobile before uploading
 ```
 
 ---
@@ -560,13 +629,15 @@ remotion-ads/
 ├── SKILL.md                        # This file
 ├── README.md                       # Quick start guide
 ├── tools/
-│   └── generate.js                 # ElevenLabs voiceover generator
+│   ├── generate.js                 # ElevenLabs voiceover generator
+│   └── suno.py                     # Suno AI music generator
 ├── dictionaries/
 │   ├── template.pls                # Dictionary template
 │   └── example.pls                 # Example dictionary
 └── rules/
     ├── setup.md
     ├── voiceover.md                # Voiceover & dictionary docs
+    ├── music.md                    # Background music generation
     ├── captions.md
     ├── animations.md
     ├── components.md

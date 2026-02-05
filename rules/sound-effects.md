@@ -145,8 +145,10 @@ with open("public/audio/sfx/whoosh.mp3", "wb") as f:
 | Stat / number | Pop / ding | `"Clean notification pop, modern UI sound"` | 0.5-1s |
 | Solution reveal | Positive chime | `"Bright uplifting chime, achievement unlock"` | 1-2s |
 | Scene transition | Swoosh | `"Smooth soft swoosh transition, left to right"` | 0.5-1s |
-| CTA | Click / tap | `"Satisfying button click, digital interface"` | 0.3-0.5s |
+| CTA | Click / tap | `"Satisfying button click, digital interface"` | 0.5s |
 | Background loop | Ambient | `"Calm professional office ambience, subtle"` | 5-15s |
+
+> **API constraint:** `duration_seconds` must be between **0.5** and **30** seconds. The API will return a 422 error for values outside this range. Use `null` to let the model auto-detect duration from the prompt.
 
 ### Batch Generation Script
 
@@ -180,7 +182,7 @@ generate_sfx "impact"       "Deep bass impact hit, dramatic, cinematic"        1
 generate_sfx "pop"          "Clean bright pop, modern notification"            0.5  0.5
 generate_sfx "chime"        "Uplifting bright chime, success, achievement"     1.5  0.5
 generate_sfx "riser"        "Tension building riser, suspenseful, dramatic"    3.0  0.5
-generate_sfx "click"        "Satisfying digital button click"                  0.3  0.5
+generate_sfx "click"        "Satisfying digital button click"                  0.5  0.5
 generate_sfx "transition"   "Smooth cinematic scene transition swoosh"         1.0  0.5
 
 echo "Done! Generated SFX in $OUTPUT_DIR"

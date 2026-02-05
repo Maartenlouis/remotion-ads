@@ -308,13 +308,97 @@ public/audio/instagram-ads/ad-example/
 
 ## Integration with Remotion
 
-### Basic Audio Integration
+### Per-Scene Audio with TransitionSeries (Recommended)
+
+When using `TransitionSeries` (fade/slide transitions between scenes), the combined audio file will drift out of sync because transitions overlap scenes visually. **Use per-scene audio files instead**, positioned with `Sequence` at the calculated start frame of each scene:
+
+```tsx
+import { AbsoluteFill, Audio, Sequence, staticFile } from "remotion";
+import { TransitionSeries, linearTiming } from "@remotion/transitions";
+import { fade } from "@remotion/transitions/fade";
+
+const FPS = 30;
+const TRANSITION_FRAMES = Math.round(FPS * 0.6); // 18 frames
+const PADDING = 5;
+
+// Use actualDuration values from info.json
+const SCENE1_FRAMES = Math.ceil(3.42 * FPS) + PADDING;
+const SCENE2_FRAMES = Math.ceil(4.35 * FPS) + PADDING;
+const SCENE3_FRAMES = Math.ceil(4.12 * FPS) + PADDING;
+const SCENE4_FRAMES = Math.ceil(3.31 * FPS) + PADDING;
+
+// Calculate when each scene starts in TransitionSeries
+// Each scene starts (previous scene duration - transition overlap) after the last
+const SCENE1_START = 0;
+const SCENE2_START = SCENE1_FRAMES - TRANSITION_FRAMES;
+const SCENE3_START = SCENE2_START + SCENE2_FRAMES - TRANSITION_FRAMES;
+const SCENE4_START = SCENE3_START + SCENE3_FRAMES - TRANSITION_FRAMES;
+
+export const TOTAL_FRAMES =
+  SCENE1_FRAMES + SCENE2_FRAMES + SCENE3_FRAMES + SCENE4_FRAMES -
+  3 * TRANSITION_FRAMES;
+
+export const AdExample: React.FC = () => {
+  return (
+    <AbsoluteFill>
+      {/* Visual: TransitionSeries for scene crossfades */}
+      <TransitionSeries>
+        <TransitionSeries.Sequence durationInFrames={SCENE1_FRAMES}>
+          <Scene1Hook />
+        </TransitionSeries.Sequence>
+        <TransitionSeries.Transition
+          presentation={fade()}
+          timing={linearTiming({ durationInFrames: TRANSITION_FRAMES })}
+        />
+        <TransitionSeries.Sequence durationInFrames={SCENE2_FRAMES}>
+          <Scene2Problem />
+        </TransitionSeries.Sequence>
+        <TransitionSeries.Transition
+          presentation={fade()}
+          timing={linearTiming({ durationInFrames: TRANSITION_FRAMES })}
+        />
+        <TransitionSeries.Sequence durationInFrames={SCENE3_FRAMES}>
+          <Scene3Solution />
+        </TransitionSeries.Sequence>
+        <TransitionSeries.Transition
+          presentation={fade()}
+          timing={linearTiming({ durationInFrames: TRANSITION_FRAMES })}
+        />
+        <TransitionSeries.Sequence durationInFrames={SCENE4_FRAMES}>
+          <Scene4CTA />
+        </TransitionSeries.Sequence>
+      </TransitionSeries>
+
+      {/* Audio: per-scene voiceover, positioned to match visual starts */}
+      <Sequence from={SCENE1_START}>
+        <Audio src={staticFile("audio/ad-example/ad-example-scene1.mp3")} volume={1.0} />
+      </Sequence>
+      <Sequence from={SCENE2_START}>
+        <Audio src={staticFile("audio/ad-example/ad-example-scene2.mp3")} volume={1.0} />
+      </Sequence>
+      <Sequence from={SCENE3_START}>
+        <Audio src={staticFile("audio/ad-example/ad-example-scene3.mp3")} volume={1.0} />
+      </Sequence>
+      <Sequence from={SCENE4_START}>
+        <Audio src={staticFile("audio/ad-example/ad-example-scene4.mp3")} volume={1.0} />
+      </Sequence>
+
+      {/* Audio: background music (low volume under voiceover) */}
+      <Audio src={staticFile("audio/ad-example/background.mp3")} volume={0.15} />
+    </AbsoluteFill>
+  );
+};
+```
+
+> **Why not the combined audio file?** With `TransitionSeries`, scenes overlap during transitions. The combined file plays all scenes back-to-back, so it drifts out of sync with the visuals — up to ~1s per transition. Per-scene audio stays locked to each visual scene.
+
+### Combined Audio with Series (Simple, No Transitions)
+
+If you use `Series` (no transition overlap), the combined audio file works fine:
 
 ```tsx
 import { Audio, Series, staticFile, useVideoConfig } from "remotion";
 
-// Import durations from generated info.json
-// Or define manually based on info.json values
 const SCENE_DURATIONS = {
   scene1: 3.42,  // actualDuration from info.json
   scene2: 4.35,
@@ -322,25 +406,18 @@ const SCENE_DURATIONS = {
   scene4: 3.31,
 };
 
-export const AdExample: React.FC = () => {
+export const AdSimple: React.FC = () => {
   const { fps } = useVideoConfig();
-
-  // Calculate frames from durations
-  const paddingFrames = 5; // Small buffer between scenes
+  const paddingFrames = 5;
   const scene1Frames = Math.round(SCENE_DURATIONS.scene1 * fps) + paddingFrames;
   const scene2Frames = Math.round(SCENE_DURATIONS.scene2 * fps) + paddingFrames;
   const scene3Frames = Math.round(SCENE_DURATIONS.scene3 * fps) + paddingFrames;
-
-  // Calculate scene4 to fill remaining time (target: 15 seconds)
   const totalTargetFrames = Math.round(15 * fps);
   const scene4Frames = totalTargetFrames - scene1Frames - scene2Frames - scene3Frames;
 
   return (
     <AbsoluteFill>
-      {/* Combined audio track */}
-      <Audio src={staticFile("audio/instagram-ads/ad-example/ad-example-combined.mp3")} />
-
-      {/* Scene sequence */}
+      <Audio src={staticFile("audio/ad-example/ad-example-combined.mp3")} />
       <Series>
         <Series.Sequence durationInFrames={scene1Frames}>
           <Scene1Hook />
@@ -355,39 +432,6 @@ export const AdExample: React.FC = () => {
           <Scene4CTA />
         </Series.Sequence>
       </Series>
-    </AbsoluteFill>
-  );
-};
-```
-
-### Per-Scene Audio (Alternative)
-
-For more precise control, use individual scene audio files:
-
-```tsx
-import { Audio, Sequence, staticFile, useVideoConfig } from "remotion";
-
-export const AdWithPerSceneAudio: React.FC = () => {
-  const { fps } = useVideoConfig();
-
-  const scene1Frames = Math.round(3.42 * fps);
-  const scene2Start = scene1Frames;
-  const scene2Frames = Math.round(4.35 * fps);
-  // ... etc
-
-  return (
-    <AbsoluteFill>
-      <Sequence from={0} durationInFrames={scene1Frames}>
-        <Audio src={staticFile("audio/instagram-ads/ad-example/ad-example-scene1.mp3")} />
-        <Scene1Hook />
-      </Sequence>
-
-      <Sequence from={scene2Start} durationInFrames={scene2Frames}>
-        <Audio src={staticFile("audio/instagram-ads/ad-example/ad-example-scene2.mp3")} />
-        <Scene2Problem />
-      </Sequence>
-
-      {/* ... more sequences */}
     </AbsoluteFill>
   );
 };
@@ -533,6 +577,8 @@ This reduces the need to manually spell out numbers in scene scripts. However, f
 
 ### Voice Selection
 
+**Finding the right voice**: Use `node tools/generate.js --list-voices` to browse all available voices. You can specify a voice by **name** (fuzzy matched) or **voice ID** (the 20-24 character alphanumeric string).
+
 | Content Type | Recommended Voice Style |
 |--------------|------------------------|
 | Legal/professional | Expert, calm |
@@ -540,6 +586,33 @@ This reduces the need to manually spell out numbers in scene scripts. However, f
 | Educational | Narrator, expert |
 | Social/casual | Conversational |
 | Emotional hook | Dramatic |
+
+#### Brand Personality → Voice Guide
+
+| Brand Personality | Voice Qualities | Example ElevenLabs Tags |
+|-------------------|----------------|------------------------|
+| Premium/luxury | Deep, smooth, unhurried | male, deep, mature |
+| Friendly/approachable | Warm, medium pitch, natural | female/male, young, friendly |
+| Bold/disruptive | Confident, energetic, punchy | male, strong, assertive |
+| Trustworthy/institutional | Steady, authoritative, clear | male, mature, professional |
+| Playful/youthful | Light, upbeat, casual | female, young, cheerful |
+| Minimal/editorial | Understated, calm, measured | male/female, calm, neutral |
+
+**Tip**: When a voice name isn't found, the tool tries prefix and substring matching (e.g., "Rachel" matches "Rachel - Conversational"). You can also use the voice ID directly from the ElevenLabs dashboard (e.g., `"pFZP5JQG7iQjIQuC4Bku"`).
+
+### Duration Estimation
+
+ElevenLabs actual output durations often differ from the `duration` hint in your scene JSON. Use word count to estimate realistic durations:
+
+| Speaking Rate | Words/Second | Style | Example |
+|---------------|-------------|-------|---------|
+| Slow/dramatic | 2.0-2.5 wps | Hooks, emotional | "When was the last time you told someone they matter?" (11 words → ~4.5s) |
+| Normal/narrative | 2.5-3.0 wps | Narration, explanation | General prose |
+| Fast/conversational | 3.0-3.5 wps | Lists, casual | Quick feature lists |
+
+**Rule of thumb**: Count the words in your scene text and divide by 2.5 for a conservative estimate. The actual audio will typically be within ±20% of this.
+
+**Always use `actualDuration` from `info.json`** for your Remotion composition frame calculations — never rely on the estimated `duration` from the scene JSON.
 
 ### Timing Tips
 

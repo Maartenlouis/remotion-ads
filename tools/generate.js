@@ -1248,20 +1248,20 @@ async function listVoices() {
   response.data.voices.forEach(voice => {
     const labels = voice.labels ? Object.values(voice.labels).join(', ') : '';
     console.log(
-      voice.name.substring(0, 24).padEnd(25) +
+      voice.name.padEnd(40) +
       voice.voice_id.padEnd(28) +
-      labels.substring(0, 25)
+      labels.substring(0, 40)
     );
   });
 
-  console.log('\nRecommended for German:');
-  console.log('  - Vossi (custom German male voice)');
-  console.log('  - Antoni (professional, warm)');
-  console.log('  - Arnold (authoritative)');
+  console.log('\nTip: Use the full voice name or voice ID in your scenes JSON.');
+  console.log('     Both exact and partial name matching are supported.');
+  console.log('     Example: "Lily" matches "Lily - Velvety Actress"');
 }
 
 async function getVoiceId(voiceName) {
-  if (voiceName.length >= 20 && voiceName.length <= 24) {
+  // If it looks like a voice ID (20-24 alphanumeric chars), use directly
+  if (/^[a-zA-Z0-9]{20,24}$/.test(voiceName)) {
     return voiceName;
   }
 
@@ -1276,14 +1276,32 @@ async function getVoiceId(voiceName) {
     throw new Error('Failed to fetch voices');
   }
 
-  const voice = response.data.voices.find(
-    v => v.name.toLowerCase() === voiceName.toLowerCase()
+  const nameLower = voiceName.toLowerCase();
+
+  // Try exact match first
+  let voice = response.data.voices.find(
+    v => v.name.toLowerCase() === nameLower
   );
 
+  // Try prefix match (e.g. "Lily" matches "Lily - Velvety Actress")
   if (!voice) {
-    throw new Error(`Voice "${voiceName}" not found. Use --list-voices to see available voices.`);
+    voice = response.data.voices.find(
+      v => v.name.toLowerCase().startsWith(nameLower)
+    );
   }
 
+  // Try contains match (e.g. "Velvety" matches "Lily - Velvety Actress")
+  if (!voice) {
+    voice = response.data.voices.find(
+      v => v.name.toLowerCase().includes(nameLower)
+    );
+  }
+
+  if (!voice) {
+    throw new Error(`Voice "${voiceName}" not found. Use --list-voices to see available voices.\nTip: You can also use a voice ID directly (e.g. "pFZP5JQG7iQjIQuC4Bku").`);
+  }
+
+  console.log(`   Resolved voice: "${voice.name}" (${voice.voice_id})`);
   return voice.voice_id;
 }
 

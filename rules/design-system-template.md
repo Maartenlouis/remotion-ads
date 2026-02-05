@@ -12,6 +12,22 @@ Copy this file to `design-system.md` and fill in your brand values.
 
 ---
 
+## Finding Your Brand Values
+
+Before filling in the template, check these common locations in your project:
+
+| What to find | Where to look |
+|-------------|---------------|
+| **Colors** | `tailwind.config.ts` → `theme.extend.colors`, CSS `:root` variables in `globals.css`, any `theme.ts` or `design-tokens.ts` |
+| **Fonts** | `@import url(...)` in CSS, `fontFamily` in Tailwind config, `loadFont` from `@remotion/google-fonts` |
+| **Logo** | `public/` directory, `assets/` directory, `app.json` (mobile), `favicon` or `icon` references in `layout.tsx` |
+| **Border radius, shadows** | CSS custom properties (`--radius-*`, `--shadow-*`), Tailwind `borderRadius` config |
+| **Spacing** | `spacing` exports in theme files, Tailwind default or custom spacing scale |
+
+For **monorepos**, check all apps — web, mobile, and video apps often share the same design tokens but in different formats (Tailwind, React Native StyleSheet, plain TypeScript).
+
+---
+
 ## Brand Colors
 
 Replace placeholder values with your brand colors:

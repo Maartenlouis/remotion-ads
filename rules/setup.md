@@ -53,9 +53,9 @@ mkdir -p public/images/instagram-ads/{backgrounds,icons,illustrations,overlays}
 mkdir -p public/audio/instagram-ads
 ```
 
-## Step 4: Generate Background Patterns
+## Step 4: Generate Background Patterns (Optional)
 
-Create `scripts/generate-backgrounds.js`:
+If your design uses patterned backgrounds (dots, gradients, grain), create a `scripts/generate-backgrounds.js` in your project. This script is **not included** in the skill — copy the code below and customize the colors:
 
 ```javascript
 const { createCanvas } = require("canvas");
@@ -173,9 +173,9 @@ console.log("\\n✅ All backgrounds generated!");
 
 Run: `node scripts/generate-backgrounds.js`
 
-## Step 5: Create Asset Scanner
+## Step 5: Create Asset Scanner (Optional)
 
-Create `scripts/scan-instagram-assets.js`:
+If you want an auto-generated manifest of your image assets, create a `scripts/scan-instagram-assets.js` in your project. This script is **not included** in the skill — copy the code below:
 
 ```javascript
 #!/usr/bin/env node
@@ -282,7 +282,7 @@ export const RemotionRoot: React.FC = () => {
 
 ## Step 8: Environment Variables
 
-Create `.env.local` with required API keys:
+Create `.env.local` in the **video app directory** (where `remotion.config.ts` lives):
 
 ```bash
 # For voiceover generation (optional)
@@ -291,6 +291,26 @@ ELEVENLABS_API_KEY=your_elevenlabs_api_key
 # For AI icon generation (optional)
 GEMINI_API_KEY=your_gemini_api_key
 ```
+
+### Monorepo Tips
+
+In a monorepo, the API key may already exist in another app (e.g., `apps/web/.env`). The `tools/generate.js` script reads the key from `process.env.ELEVENLABS_API_KEY`, so you have a few options:
+
+1. **Copy the key** to a `.env.local` in your video app directory
+2. **Symlink the file**: `ln -s ../web/.env .env.local`
+3. **Pass it inline** when running the tool:
+   ```bash
+   ELEVENLABS_API_KEY=sk_... node tools/generate.js --scenes scenes.json --output-dir public/audio/
+   ```
+4. **Export it** in your shell session before running commands:
+   ```bash
+   export ELEVENLABS_API_KEY=sk_...
+   ```
+
+Check these common locations for existing keys:
+- `apps/web/.env` or `apps/web/.env.local`
+- `.env` at the monorepo root
+- `apps/mobile/.env` or `apps/mobile/app.json` (for Expo projects)
 
 ## Verification Checklist
 

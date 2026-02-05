@@ -1,9 +1,9 @@
 ---
 title: Voiceover Integration
 description: ElevenLabs integration, scene JSON format, and timing synchronization
-section: video-creation
+section: audio
 priority: medium
-tags: [voiceover, audio, elevenlabs, timing, sync]
+tags: [voiceover, audio, elevenlabs, timing, sync, tts]
 ---
 
 # Voiceover Integration for Instagram Ads
@@ -17,6 +17,122 @@ Complete guide for generating and integrating professional voiceovers into Remot
 ```bash
 ELEVENLABS_API_KEY=your_api_key_here
 ```
+
+---
+
+## Model Selection
+
+| Model | Languages | Best For |
+|-------|-----------|----------|
+| `eleven_v3` | 74 | Highest quality, emotional range, newest model |
+| `eleven_multilingual_v2` | 29 | High quality, stable, good default for most use cases |
+| `eleven_flash_v2_5` | 32 | ~75ms latency, real-time/preview use |
+| `eleven_flash_v2` | 1 (English) | ~75ms latency, English-only fast preview |
+| `eleven_turbo_v2_5` | 32 | Low latency with balanced quality |
+
+Use `--model` to select:
+
+```bash
+# Use the newest highest-quality model
+node tools/generate.js \
+  --scenes scenes.json \
+  --model eleven_v3 \
+  --output-dir public/audio/
+
+# Use flash model for quick previews
+node tools/generate.js \
+  --scenes scenes.json \
+  --model eleven_flash_v2_5 \
+  --output-dir public/audio/
+```
+
+**Default**: `eleven_multilingual_v2`. Consider `eleven_v3` for final renders when emotional range matters (e.g., dramatic hooks, empathetic CTAs).
+
+---
+
+## Language Support
+
+For multilingual ads, specify the language with ISO 639-1 codes to enforce correct pronunciation:
+
+| Language | Code | Example Use |
+|----------|------|-------------|
+| English | `en` | Default |
+| German | `de` | DACH market ads |
+| French | `fr` | Francophone markets |
+| Spanish | `es` | LATAM / Spain |
+| Dutch | `nl` | Benelux market ads |
+
+The model auto-detects language from text, but explicit codes help with mixed-language scripts or ambiguous text.
+
+---
+
+## Voice Settings
+
+Fine-tune voice behavior with these parameters when using the API directly.
+
+### Speed
+
+The `speed` parameter controls the speaking rate as a multiplier:
+
+| Value | Effect |
+|-------|--------|
+| `0.7` | 30% slower than normal |
+| `1.0` | Normal speed (default) |
+| `1.2` | 20% faster than normal |
+
+Range: 0.7-1.2. Example:
+
+```bash
+curl -X POST "https://api.elevenlabs.io/v1/text-to-speech/YOUR_VOICE_ID" \
+  -H "xi-api-key: $ELEVENLABS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "This is spoken at a slower, more deliberate pace.",
+    "model_id": "eleven_multilingual_v2",
+    "voice_settings": {
+      "stability": 0.7,
+      "similarity_boost": 0.5,
+      "style": 0.0,
+      "speed": 0.85
+    }
+  }'
+```
+
+### Voice Settings Parameters
+
+| Parameter | Range | Default | Description |
+|-----------|-------|---------|-------------|
+| `stability` | 0.0-1.0 | 0.5 | Higher = more consistent, lower = more expressive variation |
+| `similarity_boost` | 0.0-1.0 | 0.75 | How closely to match the original voice. Higher = closer match |
+| `style` | 0.0-1.0 | 0.0 | Style exaggeration. Higher = more dramatic. Adds latency |
+| `speed` | 0.7-1.2 | 1.0 | Speaking rate multiplier |
+| `use_speaker_boost` | boolean | true | Post-processing to enhance clarity and presence. Recommended for most use cases. Disable for raw audio post-processing |
+
+### Voice Settings Presets by Use Case
+
+| Use Case | Stability | Similarity | Style | Notes |
+|----------|-----------|------------|-------|-------|
+| Audiobooks/Narration | 0.7 | 0.5 | 0.0 | Consistent tone |
+| Conversational/Chatbots | 0.4 | 0.75 | 0.3 | More expressive |
+| News/Professional | 0.8 | 0.6 | 0.0 | Very consistent |
+| Character/Drama | 0.3 | 0.8 | 0.5 | Highly expressive |
+
+### Language Code Enforcement
+
+Force a specific language for pronunciation, even if the text could be ambiguous:
+
+```bash
+curl -X POST "https://api.elevenlabs.io/v1/text-to-speech/YOUR_VOICE_ID" \
+  -H "xi-api-key: $ELEVENLABS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Der Kaufvertrag wurde am Montag unterschrieben.",
+    "model_id": "eleven_multilingual_v2",
+    "language_code": "de"
+  }'
+```
+
+This is especially important for mixed-language scripts or when the model might misdetect the language from short text segments.
 
 ---
 
@@ -397,11 +513,21 @@ Output:
 
 ## Best Practices
 
+### Text Normalization
+
+ElevenLabs can automatically normalize numbers, dates, and abbreviations for natural speech. When using the API directly, enable with `apply_text_normalization: "on"`:
+
+- `"500"` is read as "five hundred" / "fünfhundert"
+- `"24/7"` is read as "twenty-four seven"
+- `"Dr."` is read as "Doctor"
+
+This reduces the need to manually spell out numbers in scene scripts. However, for brand-critical pronunciation, still prefer explicit spelling or pronunciation dictionaries.
+
 ### Script Writing
 
 1. **Keep scenes short**: 3-5 seconds each for Instagram
 2. **Use punctuation**: Periods = pauses, commas = brief breaks
-3. **Write numbers out**: "fünfhundert" not "500"
+3. **Write numbers out**: "fünfhundert" not "500" (or enable text normalization)
 4. **Spell out abbreviations**: "24 Stunden" not "24h"
 5. **Front-load key messages**: Users may scroll away
 
@@ -422,6 +548,32 @@ Output:
 3. Problem scene: 3-5 seconds (establish pain point)
 4. Solution scene: 3-5 seconds (present answer)
 5. CTA scene: 2-4 seconds (clear next step)
+
+---
+
+## Output Format Options
+
+Default output is MP3 (44.1kHz, 128kbps). Alternative formats available via the API:
+
+| Format | Sample Rate | Bitrate | Use Case |
+|--------|-------------|---------|----------|
+| `mp3_22050_32` | 22,050 Hz | 32 kbps | Low quality, smallest file size |
+| `mp3_44100_64` | 44,100 Hz | 64 kbps | Moderate quality, smaller file |
+| `mp3_44100_128` | 44,100 Hz | 128 kbps | **Default.** Good for most use cases |
+| `mp3_44100_192` | 44,100 Hz | 192 kbps | High quality MP3 |
+| `pcm_16000` | 16,000 Hz | Raw | Speech-grade raw audio for post-processing |
+| `pcm_24000` | 24,000 Hz | Raw | Higher quality raw audio |
+| `pcm_44100` | 44,100 Hz | Raw | CD-quality raw audio |
+| `pcm_48000` | 48,000 Hz | Raw | Studio-quality raw audio |
+| `ulaw_8000` | 8,000 Hz | u-law | Telephony (North America) |
+| `alaw_8000` | 8,000 Hz | A-law | Telephony (Europe) |
+| `opus_48000_128` | 48,000 Hz | 128 kbps | Good quality Opus, efficient streaming |
+
+For Remotion video production, `mp3_44100_128` (default) is recommended. Use `pcm_44100` when you need uncompressed audio for post-processing or mixing.
+
+## Cost Monitoring
+
+ElevenLabs charges per character. Track usage via the `x-character-count` response header. A typical 15-second ad with 4 scenes uses ~200-400 characters.
 
 ---
 
@@ -456,3 +608,63 @@ node tools/generate.js \
 # 7. Render final video
 npx remotion render AdNew out/ad-new.mp4 --codec=h264 --crf=18
 ```
+
+---
+
+## Direct API Usage with JS SDK
+
+> **JS SDK Warning:** Always use `@elevenlabs/elevenlabs-js`, not the deprecated `elevenlabs` package.
+
+When using the ElevenLabs JS SDK directly (instead of the `tools/generate.js` wrapper):
+
+```javascript
+import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
+import { createWriteStream } from "fs";
+
+const client = new ElevenLabsClient();
+
+const audio = await client.textToSpeech.convert("YOUR_VOICE_ID", {
+  text: "Your voiceover text here.",
+  model_id: "eleven_multilingual_v2",
+  language_code: "de",
+  voice_settings: {
+    stability: 0.7,
+    similarity_boost: 0.5,
+    style: 0.0,
+    speed: 1.0,
+    use_speaker_boost: true,
+  },
+  output_format: "mp3_44100_128",
+});
+
+audio.pipe(createWriteStream("output.mp3"));
+```
+
+---
+
+## Speech-to-Text (Transcription)
+
+ElevenLabs also offers transcription via the Scribe v2 model, useful for:
+
+- Transcribing existing video/audio content to repurpose as ad scripts
+- Generating captions from pre-recorded audio without the generate.js pipeline
+- Speaker diarization for multi-speaker content
+
+```bash
+curl -X POST "https://api.elevenlabs.io/v1/speech-to-text" \
+  -H "xi-api-key: $ELEVENLABS_API_KEY" \
+  -F "file=@audio.mp3" \
+  -F "model_id=scribe_v2" \
+  -F "timestamps_granularity=word" \
+  -F "diarize=true"
+```
+
+Key features: 90+ languages, word-level timestamps, speaker diarization, keyterm prompting (up to 100 custom terms for domain-specific accuracy).
+
+---
+
+## Related Rules
+
+- [sound-effects.md](sound-effects.md) - Generate transition and ambient SFX
+- [music.md](music.md) - Background music generation
+- [captions.md](captions.md) - Animated captions synced to word timestamps

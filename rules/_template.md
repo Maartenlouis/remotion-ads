@@ -102,6 +102,7 @@ Valid section IDs (from `_sections.md`):
 - `setup` - Project initialization
 - `formats` - Instagram dimensions and formats
 - `video-creation` - Video production components
+- `audio` - Voiceover, sound effects, and music generation
 - `assets` - Asset management and carousels
 
 ## Writing Guidelines

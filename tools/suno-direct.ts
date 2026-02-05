@@ -134,7 +134,7 @@ function convertArtistReferences(prompt: string, tags: string): { prompt: string
 // AUDIO POST-PROCESSING
 // ============================================
 
-function applyFadeOut(inputPath: string, outputPath: string, fadeDuration: number = 3): void {
+function applyFadeOut(inputPath: string, outputPath: string, fadeDuration: number = 1): void {
   // Get audio duration using ffprobe
   try {
     const durationOutput = execSync(
@@ -150,10 +150,12 @@ function applyFadeOut(inputPath: string, outputPath: string, fadeDuration: numbe
 
     const fadeStart = Math.max(0, duration - fadeDuration);
 
-    console.log(`   🎚️ Applying ${fadeDuration}s fade out (starting at ${fadeStart.toFixed(1)}s)...`);
+    console.log(`   🎚️ Applying ${fadeDuration}s smooth fade out (starting at ${fadeStart.toFixed(1)}s)...`);
 
+    // Use exponential curve (exp) for smoother, more natural sounding fade
+    // Also apply a gentle volume reduction in the last portion for extra smoothness
     execSync(
-      `ffmpeg -i "${inputPath}" -af "afade=t=out:st=${fadeStart}:d=${fadeDuration}" -y "${outputPath}"`,
+      `ffmpeg -i "${inputPath}" -af "afade=t=out:st=${fadeStart}:d=${fadeDuration}:curve=exp" -y "${outputPath}"`,
       { stdio: "pipe" }
     );
 
@@ -161,7 +163,7 @@ function applyFadeOut(inputPath: string, outputPath: string, fadeDuration: numbe
     fs.unlinkSync(inputPath);
     fs.renameSync(outputPath, inputPath);
 
-    console.log(`   ✅ Fade out applied`);
+    console.log(`   ✅ Smooth fade out applied`);
   } catch (error) {
     console.log(`   ⚠️ Could not apply fade out: ${(error as Error).message}`);
   }
@@ -297,7 +299,7 @@ Options:
   -i, --instrumental      Generate without vocals (default: true)
   -o, --output <path>     Output file path
   --title <title>         Song title
-  --fade <seconds>        Apply fade out at end (default: 3, use 0 to disable)
+  --fade <seconds>        Smooth fade out at end (default: 1, uses exp curve, 0 to disable)
   --env <path>            Path to .env file
   -h, --help              Show this help
 
@@ -310,7 +312,7 @@ Examples:
 function parseArgs(args: string[]): Record<string, string | boolean | number> {
   const result: Record<string, string | boolean | number> = {
     instrumental: true,
-    fade: 3, // Default 3 second fade out
+    fade: 1, // Default 1 second smooth fade out (exponential curve)
   };
 
   for (let i = 0; i < args.length; i++) {

@@ -1,14 +1,170 @@
 ---
 title: Background Music Generation
-description: Generate AI background music using Suno via browser-use for Instagram Reels and video content
+description: Generate AI background music using Suno or ElevenLabs for Instagram Reels and video content
 section: audio
 priority: medium
-tags: [music, audio, suno, background, instrumental]
+tags: [music, audio, suno, elevenlabs, background, instrumental]
 ---
 
-# Background Music Generation with Suno
+# Background Music Generation
 
-Generate professional AI background music for Instagram Reels using Suno via browser-use API.
+Generate professional AI background music for Instagram Reels using **Suno** (via browser-use API) or **ElevenLabs** (native API).
+
+| Provider | Strengths | Auth |
+|----------|-----------|------|
+| **Suno** | Artist style conversion, longer tracks, vocal support | Browser token (expires 24h) |
+| **ElevenLabs** | Native API, composition plans, no browser token needed | Same API key as voiceover |
+
+---
+
+## ElevenLabs Music Generation
+
+Generate music directly through the ElevenLabs API. No browser token required -- uses the same API key as voiceover and sound effects.
+
+### API Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `prompt` | string | - | Text description of the music to generate (use with prompt mode) |
+| `music_length_ms` | number | - | Duration in milliseconds. Range: 3,000-600,000ms (3 seconds to 10 minutes) |
+| `model_id` | string | `music_v1` | Model to use for music generation |
+| `force_instrumental` | boolean | false | Guarantees no vocals in prompt mode. Use for background music under voiceover |
+| `respect_sections_durations` | boolean | false | Enforces exact `duration_ms` values in composition plan sections |
+| `composition_plan` | object | - | Structured composition plan (alternative to prompt mode) |
+
+> **Duration range**: 3,000-600,000ms (3 seconds to 10 minutes).
+
+### Quick Start
+
+```bash
+# Simple instrumental track
+curl -X POST "https://api.elevenlabs.io/v1/music/compose" \
+  -H "xi-api-key: $ELEVENLABS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "A chill lo-fi hip hop beat with jazzy piano chords",
+    "music_length_ms": 30000,
+    "force_instrumental": true
+  }' \
+  --output public/audio/background.mp3
+```
+
+### With Python SDK
+
+```python
+from elevenlabs.client import ElevenLabs
+
+client = ElevenLabs()
+audio = client.music.compose(
+    prompt="Professional ambient music for a corporate video, subtle piano with soft strings",
+    music_length_ms=30000,
+)
+
+with open("public/audio/background.mp3", "wb") as f:
+    for chunk in audio:
+        f.write(chunk)
+```
+
+### With JS SDK
+
+> **JS SDK Warning:** Always use `@elevenlabs/elevenlabs-js`. Do not use `npm install elevenlabs` (that is an outdated v1.x package).
+
+```javascript
+import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
+const client = new ElevenLabsClient();
+const audio = await client.music.compose({
+  prompt: "A chill lo-fi beat",
+  musicLengthMs: 30000,
+});
+```
+
+### Composition Plans (Advanced)
+
+For granular control over musical structure, generate a plan first, modify it, then compose:
+
+```python
+# 1. Generate a composition plan
+plan = client.music.composition_plan.create(
+    prompt="Epic orchestral piece building to a climax, then resolving peacefully",
+    music_length_ms=60000,
+)
+
+# 2. Inspect/modify the plan (sections, styles, instruments)
+print(plan)
+
+# 3. Compose from the plan
+audio = client.music.compose(
+    composition_plan=plan,
+    music_length_ms=60000,
+    respect_sections_durations=True,  # Enforce exact section durations
+)
+```
+
+#### Composition Plan Response Structure
+
+When you create a composition plan, the response includes:
+
+```json
+{
+  "positiveGlobalStyles": ["cinematic", "orchestral", "epic"],
+  "negativeGlobalStyles": ["electronic", "lo-fi"],
+  "sections": [
+    {
+      "name": "Intro",
+      "duration_ms": 15000,
+      "localStyles": ["soft", "building"],
+      "lines": []
+    },
+    {
+      "name": "Climax",
+      "duration_ms": 30000,
+      "localStyles": ["powerful", "full orchestra"],
+      "lines": []
+    },
+    {
+      "name": "Resolution",
+      "duration_ms": 15000,
+      "localStyles": ["peaceful", "fading"],
+      "lines": []
+    }
+  ]
+}
+```
+
+- **positiveGlobalStyles**: Styles applied across the entire track
+- **negativeGlobalStyles**: Styles to avoid
+- **sections[].localStyles**: Styles specific to each section
+- **sections[].duration_ms**: Duration for each section (enforced when `respect_sections_durations=true`)
+- **sections[].lines**: Lyric lines (empty for instrumental)
+
+### compose_detailed Method
+
+The `compose_detailed` method returns both the audio and the composition plan metadata in a single call:
+
+```python
+result = client.music.compose_detailed(
+    prompt="Professional ambient background music",
+    music_length_ms=30000,
+    force_instrumental=True,
+)
+
+# result contains: json (metadata), filename, audio (binary)
+print(result.json)       # Composition plan and metadata
+print(result.filename)   # Suggested filename
+# result.audio contains the audio bytes
+```
+
+This is useful when you want to inspect the composition plan that was used, or when you need the metadata for downstream processing.
+
+### Content Restrictions
+
+ElevenLabs music generation cannot reference specific artists, bands, or copyrighted lyrics. If your prompt triggers a `bad_prompt` error, the API returns a `prompt_suggestion` alternative.
+
+---
+
+## Suno Music Generation
+
+Generate music using Suno via browser-use API. Best for when you need artist style references or longer tracks.
 
 **Key Features:**
 - Automatic artist/song reference conversion (removes trademarks, preserves style)
@@ -453,6 +609,32 @@ Increase `--wait-timeout` or try a simpler prompt.
 ### Music too loud/quiet
 Adjust `volume` prop in Remotion. Start with 0.2 for background music with voiceover.
 
+### ElevenLabs: "bad_prompt" error
+Your prompt references a specific artist or copyrighted content. The error response includes a `prompt_suggestion` field with an alternative prompt you can use directly. Example:
+
+```json
+{
+  "detail": {
+    "status": "bad_prompt",
+    "message": "Prompt references copyrighted content",
+    "prompt_suggestion": "A chill lo-fi beat with jazzy piano and vinyl crackle"
+  }
+}
+```
+
+### ElevenLabs: "bad_composition_plan" error
+Your composition plan has structural issues (e.g., invalid durations, conflicting styles). The error response includes a `composition_plan_suggestion` field with a corrected plan you can use directly.
+
+```json
+{
+  "detail": {
+    "status": "bad_composition_plan",
+    "message": "Section durations exceed total length",
+    "composition_plan_suggestion": { "...corrected plan..." }
+  }
+}
+```
+
 ---
 
 ## Best Practices
@@ -464,3 +646,11 @@ Adjust `volume` prop in Remotion. Start with 0.2 for background music with voice
 5. **Keep background music subtle**: 15-25% volume during voiceover
 6. **Add fade out** at the end of your video for professional finish
 7. **Test on mobile** with headphones to ensure music isn't overpowering
+8. **Use ElevenLabs for quick iterations** when you don't need artist-style references (no token expiry)
+9. **Use composition plans** for complex multi-section music that needs structural control
+
+## Related Rules
+
+- [voiceover.md](voiceover.md) - ElevenLabs voiceover generation
+- [sound-effects.md](sound-effects.md) - Generate transition and ambient SFX
+- [captions.md](captions.md) - Animated captions synced to audio

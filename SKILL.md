@@ -34,11 +34,20 @@ See [rules/setup.md](rules/setup.md) for complete project setup.
 
 | File | Description |
 |------|-------------|
-| [rules/voiceover.md](rules/voiceover.md) | ElevenLabs integration, scene JSON, timing sync |
-| [rules/music.md](rules/music.md) | Suno AI background music generation |
+| [rules/voiceover.md](rules/voiceover.md) | ElevenLabs TTS integration, model selection, scene JSON, timing sync |
+| [rules/sound-effects.md](rules/sound-effects.md) | ElevenLabs SFX generation, batch scripts, Remotion integration |
+| [rules/music.md](rules/music.md) | Background music via ElevenLabs compose API and Suno |
 | [rules/captions.md](rules/captions.md) | Animated captions with word-level timing and highlighting |
 | [rules/animations.md](rules/animations.md) | Spring configs, transitions, animation components |
 | [rules/components.md](rules/components.md) | Reusable template components for scenes |
+
+### Ad Copywriting
+
+| File | Description |
+|------|-------------|
+| [rules/copywriting/ad-copywriting.md](rules/copywriting/ad-copywriting.md) | Script frameworks, hook formulas, CTA patterns, carousel copy |
+| [rules/copywriting/references/copy-frameworks.md](rules/copywriting/references/copy-frameworks.md) | Headline formulas, section templates, CTA examples |
+| [rules/copywriting/references/natural-transitions.md](rules/copywriting/references/natural-transitions.md) | Human-sounding transitions, AI-tell avoidance |
 
 ### Assets & Carousels
 
@@ -46,6 +55,13 @@ See [rules/setup.md](rules/setup.md) for complete project setup.
 |------|-------------|
 | [rules/local-assets.md](rules/local-assets.md) | Backgrounds, icons, illustrations management |
 | [rules/carousels.md](rules/carousels.md) | Instagram carousel design specs, batch rendering |
+
+### Distribution & Promotion
+
+| File | Description |
+|------|-------------|
+| [rules/paid-ads.md](rules/paid-ads.md) | Meta/Instagram campaign strategy, targeting, optimization |
+| [rules/social-content.md](rules/social-content.md) | Content calendar, repurposing framework, engagement strategy |
 
 ---
 
@@ -297,25 +313,32 @@ See [rules/voiceover.md](rules/voiceover.md) for complete integration guide.
 
 ## Background Music
 
-### Quick Start
+### Quick Start (ElevenLabs)
 
 ```bash
-# Generate instrumental background music
-python3 tools/suno.py \
-  --prompt "Ambient, cinematic background for professional video. 30 seconds." \
-  --tags "ambient, cinematic, professional" \
-  --instrumental \
+# Generate instrumental background music via ElevenLabs
+curl -X POST "https://api.elevenlabs.io/v1/music/compose" \
+  -H "xi-api-key: $ELEVENLABS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Professional ambient music, subtle piano with soft strings",
+    "music_length_ms": 30000,
+    "force_instrumental": true
+  }' \
   --output public/audio/instagram-ads/ad-example/background.mp3
 ```
 
-### Prerequisites
+### Quick Start (Suno)
 
-Add Suno authorization token to `.env.local`:
-```
-SUNO_AUTH_TOKEN=Bearer eyJ...
+```bash
+# Generate via Suno (requires browser token)
+npx tsx tools/suno-direct.ts \
+  -p "Ambient, cinematic background for professional video" \
+  -i \
+  -o public/audio/instagram-ads/ad-example/background.mp3
 ```
 
-Get token from Suno DevTools (see [rules/music.md](rules/music.md) for details).
+See [rules/music.md](rules/music.md) for ElevenLabs composition plans, Suno setup, and provider comparison.
 
 ### Integration with Voiceover
 
@@ -628,21 +651,33 @@ npx remotion render AdNew out/ad-new.mp4 --codec=h264 --crf=18
 remotion-ads/
 ├── SKILL.md                        # This file
 ├── README.md                       # Quick start guide
+├── metadata.json                   # Skill metadata
 ├── tools/
 │   ├── generate.js                 # ElevenLabs voiceover generator
-│   └── suno.py                     # Suno AI music generator
+│   ├── suno-direct.ts              # Suno music generator (TypeScript)
+│   └── suno.py                     # Suno music generator (Python)
 ├── dictionaries/
 │   ├── template.pls                # Dictionary template
 │   └── example.pls                 # Example dictionary
 └── rules/
-    ├── setup.md
-    ├── voiceover.md                # Voiceover & dictionary docs
-    ├── music.md                    # Background music generation
-    ├── captions.md
-    ├── animations.md
-    ├── components.md
-    ├── formats.md
-    ├── local-assets.md
-    ├── carousels.md
-    └── design-system-template.md
+    ├── _sections.md                # Section definitions and loading order
+    ├── _template.md                # Template for creating new rules
+    ├── setup.md                    # Project setup
+    ├── design-system-template.md   # Brand configuration template
+    ├── formats.md                  # Instagram format specs
+    ├── voiceover.md                # ElevenLabs TTS, models, dictionaries
+    ├── sound-effects.md            # ElevenLabs SFX generation
+    ├── music.md                    # ElevenLabs + Suno music generation
+    ├── captions.md                 # Animated word-level captions
+    ├── animations.md               # Spring configs, transitions
+    ├── components.md               # Reusable scene components
+    ├── local-assets.md             # Asset management
+    ├── carousels.md                # Carousel design specs
+    ├── paid-ads.md                 # Campaign strategy & optimization
+    ├── social-content.md           # Content calendar & distribution
+    └── copywriting/
+        ├── ad-copywriting.md       # Script & copy frameworks
+        └── references/
+            ├── copy-frameworks.md  # Headline formulas, templates
+            └── natural-transitions.md # Human-sounding transitions
 ```

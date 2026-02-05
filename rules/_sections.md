@@ -45,6 +45,23 @@ This file defines the categories and organization of rules in the remotion-ads s
   - local-assets.md
   - carousels.md
 
+### copywriting
+- **title**: Ad Copywriting
+- **description**: Script writing, headline formulas, CTA frameworks, and copy best practices for video and carousel ads
+- **priority**: 6
+- **rules**:
+  - copywriting/ad-copywriting.md
+  - copywriting/references/copy-frameworks.md
+  - copywriting/references/natural-transitions.md
+
+### distribution
+- **title**: Distribution & Promotion
+- **description**: Paid ad campaign management, social content strategy, and content repurposing
+- **priority**: 7
+- **rules**:
+  - paid-ads.md
+  - social-content.md
+
 ## Priority Levels
 
 | Priority | When to Read |
@@ -54,6 +71,8 @@ This file defines the categories and organization of rules in the remotion-ads s
 | 3 | Read when creating video content |
 | 4 | Read when working with audio (voiceover, SFX, music) |
 | 5 | Read when working with specific asset types |
+| 6 | Read when writing ad scripts or copy |
+| 7 | Read when planning distribution or campaigns |
 
 ## Rule Loading Order
 
@@ -62,14 +81,17 @@ When the skill is invoked, rules should be loaded in this order:
 1. **setup.md** - Understand project structure
 2. **design-system-template.md** - Check brand configuration
 3. **formats.md** - Understand dimension requirements
-4. **captions.md** - If animated captions are needed
-5. **animations.md** - For animation implementation
-6. **components.md** - For reusable components
-7. **voiceover.md** - If audio/voiceover is needed
-8. **sound-effects.md** - If transition/ambient SFX are needed
-9. **music.md** - If background music is needed
-10. **local-assets.md** - For asset management
-11. **carousels.md** - For carousel creation
+4. **copywriting/ad-copywriting.md** - If writing ad scripts or copy
+5. **captions.md** - If animated captions are needed
+6. **animations.md** - For animation implementation
+7. **components.md** - For reusable components
+8. **voiceover.md** - If audio/voiceover is needed
+9. **sound-effects.md** - If transition/ambient SFX are needed
+10. **music.md** - If background music is needed
+11. **local-assets.md** - For asset management
+12. **carousels.md** - For carousel creation
+13. **paid-ads.md** - If running paid campaigns
+14. **social-content.md** - If planning social distribution
 
 ## Tags Index
 
@@ -88,3 +110,8 @@ Common tags used across rules:
 | `components` | Reusable React components | components.md |
 | `assets` | Images, icons, backgrounds | local-assets.md |
 | `carousel` | Static image slideshows | carousels.md |
+| `copywriting` | Ad scripts, headlines, CTAs | copywriting/ad-copywriting.md |
+| `hooks` | Attention-grabbing openers | copywriting/ad-copywriting.md, copywriting/references/copy-frameworks.md |
+| `paid-ads` | Campaign management, targeting | paid-ads.md |
+| `social` | Content strategy, scheduling | social-content.md |
+| `distribution` | Promotion, repurposing | paid-ads.md, social-content.md |

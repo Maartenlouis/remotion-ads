@@ -1,7 +1,7 @@
 {
   "name": "remotion-ads",
-  "version": "1.0.0",
-  "description": "Instagram Reels & Carousel ad creation with Remotion",
+  "version": "2.0.0",
+  "description": "Instagram Reels & Carousel ad creation with Remotion — includes ElevenLabs audio, ad copywriting, campaign management, and social content strategy",
   "author": "Maarten van Onoesen",
   "license": "MIT",
   "repository": {
@@ -16,6 +16,12 @@
     "video",
     "ads",
     "marketing",
+    "copywriting",
+    "elevenlabs",
+    "voiceover",
+    "sound-effects",
+    "paid-ads",
+    "social-content",
     "claude-code",
     "skill"
   ],
@@ -25,15 +31,17 @@
     "rules/design-system-template.md",
     "rules/formats.md",
     "rules/voiceover.md",
+    "rules/sound-effects.md",
+    "rules/music.md",
     "rules/captions.md",
     "rules/animations.md",
     "rules/components.md",
     "rules/local-assets.md",
-    "rules/carousels.md"
-  ],
-  "dependencies": {
-    "optional": [
-      "elevenlabs-remotion-skill"
-    ]
-  }
+    "rules/carousels.md",
+    "rules/copywriting/ad-copywriting.md",
+    "rules/copywriting/references/copy-frameworks.md",
+    "rules/copywriting/references/natural-transitions.md",
+    "rules/paid-ads.md",
+    "rules/social-content.md"
+  ]
 }

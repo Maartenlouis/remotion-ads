@@ -28,8 +28,8 @@ const https = require('https');
 const { execSync } = require('child_process');
 
 // Paths
-const SKILL_DIR = path.dirname(__dirname); // Go up from tools/ to skill root
-const DICT_DIR = path.join(SKILL_DIR, 'dictionaries');
+const SKILL_DIR = path.dirname(__dirname); // Go up from scripts/ to skill root
+const DICT_DIR = path.join(SKILL_DIR, 'assets', 'dictionaries');
 const DICT_CACHE_FILE = path.join(SKILL_DIR, '.dictionary-cache.json');
 
 // Default dictionary (set to null to disable, or specify your brand dictionary name)
@@ -1108,7 +1108,7 @@ Pronunciation Dictionaries:
   brand names and technical terms.
 
   To create a custom dictionary, add a .pls file to:
-    dictionaries/
+    assets/dictionaries/
 
   Example .pls file:
     <?xml version="1.0" encoding="UTF-8"?>

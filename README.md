@@ -7,6 +7,7 @@ A Claude Code skill for creating professional video ads and explainer videos wit
 | Format | Aspect | Resolution | Duration | Scenes |
 |--------|--------|-----------|----------|--------|
 | Instagram Reels | 9:16 | 1080x1920 | 15-60s | 4 |
+| Instagram Reels (Ohneis) | 9:16 | 1080x1920 | 15-45s | Beat-driven |
 | Website Explainers | 16:9 | 1920x1080 | 60-160s | 6 |
 | Carousels | 4:5 | 1080x1350 | Static | 5-10 slides |
 
@@ -172,6 +173,7 @@ remotion-ads/
 │   ├── url-to-scenes.js              # URL → scene JSON extractor
 │   └── suno-direct.ts                # Suno music generator
 ├── references/                       # Documentation (loaded on demand)
+│   ├── ohneis-style.md               # Beat-driven cinematic reel template (@ohneis652 style)
 │   ├── brand-config-template.md      # Brand config: colors, fonts, voice, captions
 │   ├── setup.md                      # Project setup guide
 │   ├── formats.md                    # Dimension specs and safe zones

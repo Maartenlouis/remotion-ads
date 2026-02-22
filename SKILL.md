@@ -22,10 +22,12 @@ See [references/setup.md](references/setup.md) for dependencies and folder struc
 | Format | Aspect | Resolution | Duration | Scenes |
 |--------|--------|-----------|----------|--------|
 | Instagram Reels | 9:16 | 1080×1920 | 15-60s | 4 (Hook→Problem→Solution→CTA) |
+| Instagram Reels (Ohneis) | 9:16 | 1080×1920 | 15-45s | Beat-driven (word-level) |
 | Website Explainers | 16:9 | 1920×1080 | 60-160s | 6 (Hook→Problem→Context→Solution→Process→CTA) |
 | Carousels | 4:5 | 1080×1350 | Static | 5-10 slides |
 
 See [references/formats.md](references/formats.md) for safe zones and crop specs.
+See [references/ohneis-style.md](references/ohneis-style.md) for beat-driven cinematic reel template.
 See [references/website-videos.md](references/website-videos.md) for 16:9 long-form format.
 
 ---
@@ -166,6 +168,7 @@ Load these on demand based on the task:
 
 | File | When to read |
 |------|-------------|
+| [ohneis-style.md](references/ohneis-style.md) | Beat-driven cinematic reel template: mixed-font typography, hard cuts, moody photos |
 | [voiceover.md](references/voiceover.md) | ElevenLabs TTS, models, scene JSON, timing sync, dictionaries |
 | [captions.md](references/captions.md) | Animated captions: TikTok-style, word-by-word, karaoke |
 | [animations.md](references/animations.md) | Spring configs, transitions, animation components |

@@ -211,7 +211,8 @@ Load these on demand based on the task:
 
 | Script | Purpose |
 |--------|---------|
-| `scripts/generate.js` | ElevenLabs voiceover with timestamps, dictionaries, request stitching |
+| `scripts/generate.js` | ElevenLabs voiceover with dictionaries, request stitching (note: `--with-timestamps` flag is currently a no-op) |
+| `scripts/gemini-tts.mjs` | Gemini TTS — single-request generate + silence split with text-proportion boundary picker |
 | `scripts/suno-direct.ts` | Suno background music generation |
 | `scripts/url-to-scenes.js` | Extract page content into scene JSON |
 

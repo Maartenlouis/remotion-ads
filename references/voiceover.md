@@ -30,6 +30,14 @@ ELEVENLABS_API_KEY=your_api_key_here
 | `eleven_flash_v2` | 1 (English) | ~75ms latency, English-only fast preview |
 | `eleven_turbo_v2_5` | 32 | Low latency with balanced quality |
 
+> ⚠️ **`eleven_v3` warning — no request stitching, unstable timing.**
+> v3 generates each scene independently, so timing drift between expected and
+> actual scene durations can be significant (observed -2s+ on multi-second scenes).
+> Pacing also varies more between runs. **Prefer `eleven_multilingual_v2` when
+> you need predictable scene durations** (i.e., almost always for video work).
+> Use `eleven_v3` only for one-shot single-scene generation where emotional
+> nuance matters more than timing precision.
+
 Use `--model` to select:
 
 ```bash
@@ -440,6 +448,13 @@ export const AdSimple: React.FC = () => {
 ---
 
 ## Word-Level Timestamps (Captions)
+
+> ⚠️ **`--with-timestamps` is not currently implemented in the bundled `generate.js`.**
+> The flag is accepted but produces no `captions.json`. To get word-level
+> timestamps from ElevenLabs, call the API directly with the
+> `text_to_speech/with-timestamps` endpoint, or transcribe per-scene MP3s
+> through Gemini audio understanding (see `gemini-tts.md` Step 4 — that
+> approach works on any source MP3, not just Gemini-generated ones).
 
 Generate with `--with-timestamps` for animated captions:
 

@@ -173,6 +173,7 @@ Load these on demand based on the task:
 | [captions.md](references/captions.md) | Animated captions: TikTok-style, word-by-word, karaoke |
 | [animations.md](references/animations.md) | Spring configs, transitions, animation components |
 | [components.md](references/components.md) | Reusable scene template components |
+| [html-in-canvas.md](references/html-in-canvas.md) | Render live DOM into a canvas with 2D filters or WebGL2 shaders (vintage, progressive blur, page-tour mockup) |
 | [website-videos.md](references/website-videos.md) | 16:9 long-form format, 6-scene structure |
 | [url-to-video.md](references/url-to-video.md) | Create videos from existing web pages |
 
